@@ -1,0 +1,95 @@
+---
+title: "Quarto Homework - Question 3"
+format: html
+---
+
+```{r, echo=TRUE}
+# 필요한 패키지 로드
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+# 데이터 불러오기
+tortilla_data <- read_csv("tortilla_data.csv")
+
+# 데이터 확인
+head(tortilla_data)
+
+# (a) 2007년 평균 가격 계산
+avg_2007 <- mean(tortilla_data$tortilla_price[tortilla_data$year == 2007], na.rm = TRUE)
+
+# (b) 2024년 평균 가격 계산
+avg_2024 <- mean(tortilla_data$tortilla_price[tortilla_data$year == 2024], na.rm = TRUE)
+
+# (c) 2007년과 2024년 사이의 가격 변화율 계산
+percent_change <- ((avg_2024 - avg_2007) / avg_2007) * 100
+
+# (d) 연도별 평균 가격 플롯 생성
+avg_price_by_year <- tortilla_data %>%
+  group_by(year) %>%
+  summarize(avg_price = mean(tortilla_price, na.rm = TRUE))
+
+ggplot(avg_price_by_year, aes(x = year, y = avg_price)) +
+  geom_line() +
+  labs(
+    title = "멕시코 토르티야 평균 가격 (2007-2024)",
+    x = "연도",
+    y = "평균 가격 (페소)"
+  ) +
+  theme_minimal()
+
+# (e) 2016년 각 주의 요약 통계 및 박스플롯 생성
+data_2016 <- tortilla_data %>% filter(year == 2016)
+
+summary_2016 <- data_2016 %>%
+  group_by(state) %>%
+  summarize(
+    mean_price = mean(tortilla_price, na.rm = TRUE),
+    median_price = median(tortilla_price, na.rm = TRUE),
+    sd_price = sd(tortilla_price, na.rm = TRUE)
+  )
+
+ggplot(data_2016, aes(x = state, y = tortilla_price)) +
+  geom_boxplot() +
+  labs(
+    title = "2016년 주별 토르티야 가격 분포",
+    x = "주",
+    y = "가격 (페소)"
+  ) +
+  theme_minimal()
+
+# (f) 누에보 레온 주의 연도별 상점 유형에 따른 가격 변동 플롯 생성
+nuevo_leon_data <- tortilla_data %>% filter(state == "Nuevo León")
+
+ggplot(nuevo_leon_data, aes(x = year, y = tortilla_price, color = store_type)) +
+  geom_line() +
+  labs(
+    title = "누에보 레온 주의 상점 유형별 토르티야 가격 (2007-2024)",
+    x = "연도",
+    y = "가격 (페소)",
+    caption = "소형 사업체와 대형 기업 간의 비교"
+  ) +
+  theme_minimal()
+
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
